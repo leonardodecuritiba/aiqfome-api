@@ -1,0 +1,27 @@
+{
+    "name": "aiqfome-api",
+    "version": "1.0.0",
+    "description": "Desafio MagazineLuiza",
+    "author": "<silva.zanin@gmail.com>",
+    "license": "MIT",
+    "main": "dist/presentation/server.js",
+    "scripts": {
+        "format": "prettier --write \"src/**/*.ts\"",
+        "test": "jest",
+        "build": "tsc",
+        "start": "node dist/presentation/server.js"
+    },
+    "devDependencies": {
+        "@types/jest": "^30.0.0",
+        "@types/supertest": "^6.0.3",
+        "jest": "^30.0.3",
+        "prettier": "^3.6.2",
+        "supertest": "^7.1.1",
+        "ts-jest": "^29.4.0",
+        "typescript": "^5.8.3"
+    },
+    "dependencies": {
+        "dotenv": "^17.0.1",
+        "zod": "^3.25.67"
+    }
+}
