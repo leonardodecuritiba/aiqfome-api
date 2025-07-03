@@ -295,7 +295,7 @@ Remove um cliente do sistema.
 
 | Parâmetro     | Tipo    | Descrição                                   |
 |---------------|---------|---------------------------------------------|
-| `clientId`    | integer | O ID do cliente a ser removido.             |
+| `clientId`    | string | O ID do cliente a ser removido.             |
 
 **Exemplo de Requisição:**
 

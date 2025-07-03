@@ -16,7 +16,6 @@ const redisService = new RedisService(
 );
 
 let clientRepository: IClientRepository;
-console.log('NODE_ENV:', process.env.NODE_ENV);
 if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
     clientRepository = new InMemoryClientRepository();
 } else {
