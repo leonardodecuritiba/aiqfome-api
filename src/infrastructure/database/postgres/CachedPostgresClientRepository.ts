@@ -50,7 +50,6 @@ export class CachedPostgresClientRepository implements IClientRepository {
 
         const cached = await this.cacheService.get<Client>(cacheKey);
         if (cached) {
-            console.log(`Cache hit for API key: ${apiKey}`);
             return cached;
         }
 
