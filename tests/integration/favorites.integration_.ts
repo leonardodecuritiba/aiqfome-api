@@ -1,7 +1,8 @@
 import request from 'supertest';
 import { router } from '../../src/presentation/routes';
-import { clientRepository } from '../../src/presentation/container';
+import { clientRepository, productService } from '../../src/presentation/container';
 import { InMemoryClientRepository } from '../../src/infrastructure/database/in-memory/InMemoryClientRepository';
+import { Product } from '../../src/domain/entities/product.entity';
 
 describe('Favorites Routes Integration', () => {
     let apiKey: string;
@@ -13,16 +14,26 @@ describe('Favorites Routes Integration', () => {
         const clientData = { name: 'Leonardo Zanin', email: 'leonardo.zanin@example.com' };
         const res = await request(router).post('/clients').send(clientData);
         apiKey = res.body.apiKey;
+        jest.restoreAllMocks();
     });
 
     it('POST /favorites/{productId} should add a product to favorites with a valid API Key', async () => {
         const productId = 1;
+        const mockedProduct: Product = {
+            id: productId,
+            title: 'Test Product',
+            price: 9.99,
+            image: 'test.jpg',
+        };
+        jest.spyOn(productService, 'findProductById').mockResolvedValue(mockedProduct);
+
         const response = await request(router)
             .post(`/favorites/${productId}`)
             .set('x-api-key', apiKey);
         expect(response.status).toBe(200);
         expect(response.body.favorites).toHaveLength(1);
         expect(response.body.favorites[0].id).toBe(productId);
+        expect(response.body.favorites[0].title).toBe(mockedProduct.title);
     });
 
     it('POST /favorites/{productId} should return 401 if API Key is missing', async () => {
@@ -43,7 +54,8 @@ describe('Favorites Routes Integration', () => {
     });
 
     it('POST /favorites/{productId} should return 404 if product does not exist', async () => {
-        const nonExistentProductId = 999;
+        const nonExistentProductId = 9999;
+        jest.spyOn(productService, 'findProductById').mockResolvedValue(null);
         const response = await request(router)
             .post(`/favorites/${nonExistentProductId}`)
             .set('x-api-key', apiKey);

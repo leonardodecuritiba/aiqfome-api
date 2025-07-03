@@ -26,7 +26,13 @@ export class FakeStoreProductService implements IProductService {
                 return null;
             }
 
-            const data = (await response.json()) as FakeStoreProductDTO;
+            const content = await response.text();
+
+            if (!content) {
+                return null;
+            }
+
+            const data = JSON.parse(content) as FakeStoreProductDTO;
 
             if (!data || !data.id) {
                 return null;

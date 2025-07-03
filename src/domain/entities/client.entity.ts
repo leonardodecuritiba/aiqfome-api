@@ -1,6 +1,7 @@
 import { randomUUID } from 'crypto';
 import { Product } from './product.entity';
 import { ProductAlreadyInFavoritesError } from '../../application/errors/ProductAlreadyInFavoritesError';
+import { ProductNotFoundError } from '../../application/errors/ProductNotFoundError';
 
 interface ClientProps {
     id?: string;
@@ -44,5 +45,14 @@ export class Client {
             throw new ProductAlreadyInFavoritesError();
         }
         this.favorites.push(product);
+    }
+
+    deleteFavorite(product: Product) {
+        const favoriteIndex = this.favorites.findIndex((fav) => fav.id === product.id);
+        if (favoriteIndex !== -1) {
+            this.favorites.splice(favoriteIndex, 1);
+            return true;
+        }
+        throw new ProductNotFoundError();
     }
 }

@@ -4,18 +4,18 @@ import { ClientNotFoundError } from '../errors/ClientNotFoundError';
 import { ProductNotFoundError } from '../errors/ProductNotFoundError';
 import { Client } from '../../domain/entities/client.entity';
 
-interface AddFavoriteProductRequest {
+interface DeleteFavoriteProductUseCaseRequest {
     clientId: string;
     productId: number;
 }
 
-export class AddFavoriteProductUseCase {
+export class DeleteFavoriteProductUseCase {
     constructor(
         private clientRepository: IClientRepository,
         private productService: IProductService,
     ) {}
 
-    async execute({ clientId, productId }: AddFavoriteProductRequest): Promise<Client> {
+    async execute({ clientId, productId }: DeleteFavoriteProductUseCaseRequest): Promise<Client> {
         const client = await this.clientRepository.findById(clientId);
         if (!client) {
             throw new ClientNotFoundError();
@@ -26,7 +26,7 @@ export class AddFavoriteProductUseCase {
             throw new ProductNotFoundError();
         }
 
-        client.addFavorite(product);
+        client.deleteFavorite(product);
 
         await this.clientRepository.update(client);
 

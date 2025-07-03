@@ -1,8 +1,7 @@
-import { AddFavoriteProductUseCase } from './../../../src/application/use-cases/AddFavoriteProductUseCase';
+import { DeleteFavoriteProductUseCase } from './../../../src/application/use-cases/DeleteFavoriteProductUseCase';
+import { AddFavoriteProductUseCase } from '../../../src/application/use-cases/AddFavoriteProductUseCase';
 import { IProductService } from '../../../src/application/services/IProductService';
-import { ClientNotFoundError } from '../../../src/application/errors/ClientNotFoundError';
 import { ProductNotFoundError } from '../../../src/application/errors/ProductNotFoundError';
-import { ProductAlreadyInFavoritesError } from '../../../src/application/errors/ProductAlreadyInFavoritesError';
 import { Product } from '../../../src/domain/entities/product.entity';
 import { Client } from '../../../src/domain/entities/client.entity';
 import { InMemoryClientRepository } from '../../../src/infrastructure/database/in-memory/InMemoryClientRepository';
@@ -14,10 +13,11 @@ class FakeProductService implements IProductService {
     }
 }
 
-describe('AddFavoriteProductUseCase', () => {
+describe('DeleteFavoriteProductUseCase', () => {
     let clientRepository: InMemoryClientRepository;
     let productService: FakeProductService;
     let addFavoriteProductUseCase: AddFavoriteProductUseCase;
+    let deleteFavoriteProductUseCase: DeleteFavoriteProductUseCase;
     let client: Client;
     const products: Product[] = [
         {
@@ -41,12 +41,16 @@ describe('AddFavoriteProductUseCase', () => {
         clientRepository = new InMemoryClientRepository();
         productService = new FakeProductService();
         addFavoriteProductUseCase = new AddFavoriteProductUseCase(clientRepository, productService);
+        deleteFavoriteProductUseCase = new DeleteFavoriteProductUseCase(
+            clientRepository,
+            productService,
+        );
         client = new Client({ name: 'Test User', email: 'test@user.com' });
         await clientRepository.create(client);
         productService.products = products;
     });
 
-    it('should add a favorite product to a client', async () => {
+    it('should remove a favorite product from client', async () => {
         const updatedClient = await addFavoriteProductUseCase.execute({
             clientId: client.id,
             productId: products[0].id,
@@ -54,53 +58,29 @@ describe('AddFavoriteProductUseCase', () => {
 
         expect(updatedClient.favorites).toHaveLength(1);
         expect(updatedClient.favorites[0].id).toBe(products[0].id);
-    });
 
-    it('should add N favorites products to a client', async () => {
-        let updatedClient = await addFavoriteProductUseCase.execute({
+        await deleteFavoriteProductUseCase.execute({
             clientId: client.id,
             productId: products[0].id,
         });
 
-        updatedClient = await addFavoriteProductUseCase.execute({
+        expect(updatedClient.favorites).toHaveLength(0);
+    });
+
+    it('should throw ProductNotFoundError if favorite does not exist', async () => {
+        const updatedClient = await addFavoriteProductUseCase.execute({
             clientId: client.id,
-            productId: products[1].id,
+            productId: products[0].id,
         });
 
-        expect(updatedClient.favorites).toHaveLength(2);
+        expect(updatedClient.favorites).toHaveLength(1);
         expect(updatedClient.favorites[0].id).toBe(products[0].id);
-        expect(updatedClient.favorites[1].id).toBe(products[1].id);
-    });
 
-    it('should throw ClientNotFoundError if client does not exist', async () => {
         await expect(
-            addFavoriteProductUseCase.execute({
-                clientId: 'non-existent-id',
-                productId: products[0].id,
-            }),
-        ).rejects.toThrow(ClientNotFoundError);
-    });
-
-    it('should throw ProductNotFoundError if product does not exist', async () => {
-        await expect(
-            addFavoriteProductUseCase.execute({
+            deleteFavoriteProductUseCase.execute({
                 clientId: client.id,
-                productId: 0,
+                productId: products[1].id,
             }),
         ).rejects.toThrow(ProductNotFoundError);
-    });
-
-    it('should throw ProductAlreadyInFavoritesError if product is already a favorite', async () => {
-        await addFavoriteProductUseCase.execute({
-            clientId: client.id,
-            productId: products[0].id,
-        });
-
-        await expect(
-            addFavoriteProductUseCase.execute({
-                clientId: client.id,
-                productId: products[0].id,
-            }),
-        ).rejects.toThrow(ProductAlreadyInFavoritesError);
     });
 });

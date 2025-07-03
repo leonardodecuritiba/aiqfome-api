@@ -24,7 +24,7 @@ export class InMemoryClientRepository implements IClientRepository {
         return client || null;
     }
 
-    async remove(id: string): Promise<boolean> {
+    async delete(id: string): Promise<boolean> {
         const clientIndex = this.clients.findIndex((c) => c.id === id);
         if (clientIndex !== -1) {
             this.clients.splice(clientIndex, 1);

@@ -6,5 +6,5 @@ export interface IClientRepository {
     findById(id: string): Promise<Client | null>;
     findByApiKey(apiKey: string): Promise<Client | null>;
     update(client: Client): Promise<Client>;
-    remove(id: string): Promise<boolean>;
+    delete(id: string): Promise<boolean>;
 }

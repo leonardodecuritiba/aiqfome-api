@@ -5,6 +5,7 @@ import { UnauthorizedError } from '../../application/errors/UnauthorizedError';
 import { ProductAlreadyInFavoritesError } from '../../application/errors/ProductAlreadyInFavoritesError';
 import { ClientNotFoundError } from '../../application/errors/ClientNotFoundError';
 import { ProductNotFoundError } from '../../application/errors/ProductNotFoundError';
+import { ForbiddenError } from '../../application/errors/ForbiddenError';
 
 export const errorHandler = (res: ServerResponse, error: unknown) => {
     // console.error(error);
@@ -24,19 +25,25 @@ export const errorHandler = (res: ServerResponse, error: unknown) => {
         error instanceof EmailAlreadyExistsError ||
         error instanceof ProductAlreadyInFavoritesError
     ) {
-        res.writeHead(409, { 'Content-Type': 'application/json' });
+        res.writeHead(error.statusCode, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ message: error.message }));
         return;
     }
 
     if (error instanceof ClientNotFoundError || error instanceof ProductNotFoundError) {
-        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.writeHead(error.statusCode, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ message: error.message }));
         return;
     }
 
     if (error instanceof UnauthorizedError) {
-        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.writeHead(error.statusCode, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: error.message }));
+        return;
+    }
+
+    if (error instanceof ForbiddenError) {
+        res.writeHead(error.statusCode, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ message: error.message }));
         return;
     }

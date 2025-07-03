@@ -1,0 +1,58 @@
+@baseUrl = http://localhost:3000
+
+### Criar um novo cliente (Sucesso)
+# @name createClient
+POST {{baseUrl}}/clients
+Content-Type: application/json
+
+{
+  "name": "Leonardo Zanin",
+  "email": "leonardo.zanin@example.com"
+}
+
+### Extrai a apiKey da resposta e guarda na variável 'clientApiKey'
+@clientApiKey = {{createClient.response.body.apiKey}}
+@clientId = {{createClient.response.body.id}}
+
+### Tenta criar um novo cliente (Email já existe - deve retornar 409 Conflict)
+POST {{baseUrl}}/clients
+Content-Type: application/json
+
+{
+  "name": "Leonardo Zanin",
+  "email": "leonardo.zanin@example.com"
+}
+
+### Atualiza um cliente
+PATCH {{baseUrl}}/clients
+Content-Type: application/json
+X-API-Key: {{ clientApiKey }}
+
+{
+  "name": "Leonardo Zanin",
+  "email": "leonardo.zanin@example.com"
+}
+
+### Mostra o cliente
+GET {{baseUrl}}/clients
+X-API-Key: {{ clientApiKey }}
+
+### Remove um cliente
+DELETE {{baseUrl}}/clients/{{ clientId }}
+X-API-Key: {{ clientApiKey }}
+
+
+### Adicionar um produto favorito (Sucesso)
+# Substitua 1 pelo ID do produto desejado (ex: 1, 2, 3, etc. da fakestoreapi.com)
+@productId = 1
+# @name addFavoriteSuccess
+POST {{baseUrl}}/favorites/{{ productId }}
+X-API-Key: {{ clientApiKey }}
+
+### Remove um produto favorito (Sucesso)
+# Substitua 1 pelo ID do produto desejado (ex: 1, 2, 3, etc. da fakestoreapi.com)
+@productId = 2
+# @name addFavoriteSuccess
+DELETE {{baseUrl}}/favorites/{{ productId }}
+X-API-Key: {{ clientApiKey }}
+

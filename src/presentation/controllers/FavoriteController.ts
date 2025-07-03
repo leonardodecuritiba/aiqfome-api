@@ -1,6 +1,6 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import { z } from 'zod';
-import { addFavoriteProductUseCase } from '../container';
+import { addFavoriteProductUseCase, deleteFavoriteProductUseCase } from '../container';
 import { Client } from '../../domain/entities/client.entity';
 
 const addFavoriteSchema = z.object({
@@ -18,6 +18,24 @@ export class FavoriteController {
         const { productId } = addFavoriteSchema.parse(validationData);
 
         const client = await addFavoriteProductUseCase.execute({
+            clientId: authenticatedClient.id,
+            productId,
+        });
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(client));
+    }
+
+    async remove(req: IncomingMessage, res: ServerResponse, authenticatedClient: Client) {
+        const urlParts = req.url?.split('/').filter(Boolean) || [];
+
+        const validationData = {
+            productId: parseInt(urlParts[urlParts.length - 1], 10),
+        };
+
+        const { productId } = addFavoriteSchema.parse(validationData);
+
+        const client = await deleteFavoriteProductUseCase.execute({
             clientId: authenticatedClient.id,
             productId,
         });
