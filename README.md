@@ -4,11 +4,13 @@
 Este projeto implementa um serviço de gerenciamento de clientes e seus produtos favoritos seguindo os princípios de Clean Architecture, SOLID e boas práticas de desenvolvimento. O sistema inclui:
 
 - API REST para operações CRUD de clientes e produtos favoritos.
+- Cache com Redis para melhor desempenho e evitar sobrecarga
 - Containerização com Docker
 
 ### Boas Práticas Implementadas
 Separação clara entre domínio, aplicação e infraestrutura, considerando os princípios da Clean Architecture.
 - Tratamento de Erros: Middleware centralizado para tratamento de erros
+- Cache Strategy: Padrão Cache-Aside para melhor desempenho
 
 ## Estrutura do Projeto
 - domain: Domínio e regras de negócio
@@ -16,9 +18,16 @@ Separação clara entre domínio, aplicação e infraestrutura, considerando os 
 - application: camada de aplicação, contendo regras de negócios e serviços
 - presentation: rotas e controladores http
 
+### Escalabilidade
+O sistema foi projetado para escalabilidade horizontal:
+- Cache Redis: Reduz carga no banco de dados para operações de leitura
+- Stateless Design: A aplicação não mantém estado, permitindo múltiplas instâncias
+- Containerização: Fácil escalonamento com Docker e Kubernetes
+
 ## Requisitos
 - Node.js 22+
 - Docker e Docker Compose
+- Redis
 - PostgreSQL
 
 ## Instalação

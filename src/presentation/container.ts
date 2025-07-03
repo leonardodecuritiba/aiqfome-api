@@ -1,3 +1,4 @@
+import { RedisService } from './../infrastructure/cache/RedisService';
 import { UpdateClientUseCase } from './../application/use-cases/UpdateClientUseCase';
 import { InMemoryClientRepository } from '../infrastructure/database/in-memory/InMemoryClientRepository';
 import { FakeStoreProductService } from '../infrastructure/services/FakeStoreProductService';
@@ -7,15 +8,19 @@ import { AddFavoriteProductUseCase } from '../application/use-cases/AddFavoriteP
 import { ShowClientUseCase } from '../application/use-cases/ShowClientUseCase';
 import { DeleteClientUseCase } from '../application/use-cases/DeleteClientUseCase';
 import { DeleteFavoriteProductUseCase } from '../application/use-cases/DeleteFavoriteProductUseCase';
-import { PostgresClientRepository } from '../infrastructure/database/postgres/PostgresClientRepository';
 import { IClientRepository } from '../domain/repositories/IClientRepository';
+import { CachedPostgresClientRepository } from '../infrastructure/database/postgres/CachedPostgresClientRepository';
+
+const redisService = new RedisService(
+    `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
+);
 
 let clientRepository: IClientRepository;
 console.log('NODE_ENV:', process.env.NODE_ENV);
 if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
     clientRepository = new InMemoryClientRepository();
 } else {
-    clientRepository = new PostgresClientRepository();
+    clientRepository = new CachedPostgresClientRepository(redisService);
 }
 export { clientRepository };
 export const productService = new FakeStoreProductService();
