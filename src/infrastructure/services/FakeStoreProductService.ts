@@ -43,6 +43,7 @@ export class FakeStoreProductService implements IProductService {
                 title: data.title,
                 price: data.price,
                 image: data.image,
+                rating: data.rating,
             };
 
             return product;

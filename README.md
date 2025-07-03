@@ -9,7 +9,6 @@ Este projeto implementa um serviço de gerenciamento de clientes e seus produtos
 ### Boas Práticas Implementadas
 Separação clara entre domínio, aplicação e infraestrutura, considerando os princípios da Clean Architecture.
 - Tratamento de Erros: Middleware centralizado para tratamento de erros
-- Autenticação: Middleware centralizado para tratamento de erros
 
 ## Estrutura do Projeto
 - domain: Domínio e regras de negócio
@@ -42,10 +41,13 @@ docker-compose up -d
 
 ## Estrutura de Testes
 - integration: Testes de integração
-- unit: Testes de unidade
+- use-cases: Testes de unidade
 
 ## Desenvolvimento
-
+Para iniciar o banco de dados execute (criar as tabelas):
+```bash
+yarn ts-node setup-db.ts
+```
 Para iniciar o servidor em modo desenvolvimento:
 ```bash
 yarn dev
@@ -67,8 +69,63 @@ yarn format
 
 Para executar os testes:
 ```bash
-npm test
+yarn test
 ```
+---
+## Como Rodar a Aplicação com Docker Compose
+
+Siga os passos abaixo para subir a aplicação e o banco de dados usando Docker Compose:
+
+1.  **Construa e Inicie os Serviços:**
+    O Docker Compose irá construir a imagem da API (se necessário) e iniciar os containers da API e do banco de dados.
+    ```bash
+    docker-compose up --build
+    ```
+    - O `--build` garante que a imagem da API seja reconstruída, incorporando as últimas alterações.
+    - Na primeira vez, pode demorar um pouco para baixar as imagens base e construir a imagem da API.
+
+2.  **Verifique os Containers:**
+    Você pode verificar o status dos containers em execução:
+    ```bash
+    docker-compose ps
+    ```
+
+3.  **Acesse a API:**
+    A API estará disponível em `http://localhost:3000`.
+
+5.  **Parar os Serviços:**
+    Para parar e remover os containers (e a rede padrão criada pelo Docker Compose):
+    ```bash
+    docker-compose down
+    ```
+
+---
+
+## Variáveis de Ambiente
+
+As variáveis de ambiente para a conexão com o banco de dados são gerenciadas através do arquivo `.env` na raiz do projeto. Este arquivo é carregado automaticamente pelo Docker Compose para os serviços `api` e `db`.
+
+**Exemplo de `.env`:**
+
+```dotenv
+APP_PORT=3000
+NODE_ENV=production
+LOG_LEVEL=debug
+FAKE_API=https://fakestoreapi.com
+
+DB_PORT=5433
+DB_HOST=localhost
+DB_USER=user
+DB_PASSWORD=password
+DB_NAME=favorites
+```
+
+---
+
+## Considerações 
+
+- **Persistência de Dados:** O volume `postgres_data` garante que os dados do PostgreSQL persistam mesmo se o container do banco de dados for removido e recriado (a menos que você use `docker-compose down -v`).
+- **Ambiente de Desenvolvimento:** Para desenvolvimento local sem Docker, a aplicação continuará usando o repositório em memória, a menos que a variável de ambiente `NODE_ENV` seja definida como `production`.
 
 # Documentação da API Aiqfome
 
@@ -108,7 +165,7 @@ Cria um novo cliente no sistema.
 
 ```bash
 curl -X POST \
-  http://localhost:3001/clients \
+  http://localhost:3000/clients \
   -H 'Content-Type: application/json' \
   -d '{
     "name": "Leonardo Zanin",
@@ -153,7 +210,7 @@ Atualiza um cliente no sistema.
 
 ```bash
 curl -X PATCH \
-  http://localhost:3001/clients \
+  http://localhost:3000/clients \
   -H 'Content-Type: application/json' \
   -H 'x-api-key: <sua_api_key_aqui>'
   -d '{
@@ -194,7 +251,7 @@ Mostra os dados do cliente logado no sistema.
 
 ```bash
 curl -X GET \
-  http://localhost:3001/clients \
+  http://localhost:3000/clients \
   -H 'Content-Type: application/json' \
   -H 'x-api-key: <sua_api_key_aqui>'
 ```
@@ -235,7 +292,7 @@ Remove um cliente do sistema.
 
 ```bash
 curl -X DELETE \
-  http://localhost:3001/clients/a1b2c3d4-e5f6-7890-1234-567890abcdef \
+  http://localhost:3000/clients/a1b2c3d4-e5f6-7890-1234-567890abcdef \
   -H 'x-api-key: <sua_api_key_aqui>'
 ```
 
@@ -274,7 +331,7 @@ Adiciona um produto à lista de favoritos do cliente autenticado.
 
 ```bash
 curl -X POST \
-  http://localhost:3001/favorites/1 \
+  http://localhost:3000/favorites/1 \
   -H 'x-api-key: <sua_api_key_aqui>'
 ```
 
@@ -321,7 +378,7 @@ Remove um produto da lista de favoritos do cliente autenticado.
 
 ```bash
 curl -X DELETE \
-  http://localhost:3001/favorites/1 \
+  http://localhost:3000/favorites/1 \
   -H 'x-api-key: <sua_api_key_aqui>'
 ```
 

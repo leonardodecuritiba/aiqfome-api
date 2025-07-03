@@ -60,10 +60,7 @@ export class ClientController {
             clientId: urlParts[urlParts.length - 1],
         };
         const clientValidated = IdSchema.parse(validationData);
-        const client = await deleteClientUseCase.execute(
-            clientValidated,
-            authenticatedClient.apiKey,
-        );
+        await deleteClientUseCase.execute(clientValidated, authenticatedClient.apiKey);
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ message: 'Client deleted successfully' }));

@@ -1,33 +1,24 @@
 services:
-    # app:
-    #     build: .
-    #     container_name: aiqfome-api
-    #     ports:
-    #         - '${APP_PORT}:${APP_PORT}'
-    #     env_file:
-    #       - .env
-    #     depends_on:
-    #       - db
-    #       # - redis
-    #     volumes:
-    #       - .:/app
-    #       - /app/node_modules
+    app:
+        build: .
+        container_name: aiqfome-api
+        ports:
+            - '${APP_PORT}:${APP_PORT}'
+        env_file:
+            - .env
+        depends_on:
+            - db
     db:
-      image: postgres:14-alpine
-      container_name: aiqfome-db
-      environment:
-        - POSTGRES_PASSWORD=${DB_PASSWORD}
-        - POSTGRES_USER=${DB_USER}
-        - POSTGRES_DB=${DB_NAME}
-      restart: always
-      ports:
-        - "${DB_PORT}:5432"
-      volumes:
-        - postgres_data:/var/lib/postgresql/data
-
-    # redis:
-    #     image: redis:7-alpine
-    #     ports:
-    #         - '6379:6379'
+        image: postgres:14-alpine
+        container_name: aiqfome-db
+        environment:
+            - POSTGRES_PASSWORD=${DB_PASSWORD}
+            - POSTGRES_USER=${DB_USER}
+            - POSTGRES_DB=${DB_NAME}
+        restart: always
+        ports:
+            - '${DB_PORT}:5432'
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
 volumes:
     postgres_data:

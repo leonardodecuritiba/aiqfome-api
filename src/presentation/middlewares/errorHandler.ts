@@ -8,8 +8,6 @@ import { ProductNotFoundError } from '../../application/errors/ProductNotFoundEr
 import { ForbiddenError } from '../../application/errors/ForbiddenError';
 
 export const errorHandler = (res: ServerResponse, error: unknown) => {
-    // console.error(error);
-
     if (error instanceof ZodError) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(
